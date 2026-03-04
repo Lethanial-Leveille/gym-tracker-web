@@ -39,3 +39,4 @@ export const api = {
     request(path, { method: "PATCH", body: JSON.stringify(body) }),
   del: (path: string) => request(path, { method: "DELETE" }),
 };
+
