@@ -9,6 +9,7 @@ import ProtectedLayout from "./components/ProtectedLayout";
 /*
   ARCHITECTURE NOTE:
   ──────────────────
+  We removed WorkoutsPage and WorkoutDetailPage.
   The new flow is: Home → Start Session → Add exercises → Log sets → Finish.
   No more templates/plans. Simpler UX.
 
