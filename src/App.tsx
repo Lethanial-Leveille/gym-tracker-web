@@ -1,20 +1,24 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
 import WorkoutsPage from "./pages/WorkoutsPage";
 import WorkoutDetailPage from "./pages/WorkoutDetailPage";
 import SessionPage from "./pages/SessionPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-function DefaultRoute() {
-  // Always send people to workouts
-  window.location.replace("/workouts");
-  return null;
-}
-
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/workouts"
@@ -43,7 +47,7 @@ export default function App() {
         }
       />
 
-      <Route path="*" element={<DefaultRoute />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

@@ -5,63 +5,120 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleSubmit = async () => {
     setStatus("");
+    const trimmedEmail = email.trim();
+    const trimmedPass = password.trim();
+
+    if (!trimmedEmail || !trimmedPass) {
+      setStatus("Email and password are required");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await loginApi(email, password);
-      window.location.assign("/workouts");
+      if (isLogin) {
+        await loginApi(trimmedEmail, trimmedPass);
+        window.location.assign("/");
+      } else {
+        await registerApi(trimmedEmail, trimmedPass);
+        setStatus("Account created — you can log in now");
+        setIsLogin(true);
+      }
     } catch (e: any) {
-      setStatus(e.message || "Login failed");
+      setStatus(e.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRegister = async () => {
-    setStatus("");
-    try {
-      await registerApi(email, password);
-      setStatus("Registered, now log in");
-    } catch (e: any) {
-      setStatus(e.message || "Register failed");
-    }
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSubmit();
   };
 
   return (
-    <div className="container" style={{ maxWidth: 520 }}>
-      <div className="header">
-        <h1 className="h1">Gym Tracker</h1>
-        <span className="badge">Sign in</span>
-      </div>
-
-      {status ? <div className="alert">{status}</div> : null}
-      <div className="spacer" />
-
-      <div className="card">
-        <h2 className="h2">Account</h2>
-        <div className="row">
-          <input
-            placeholder="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: 260 }}
-          />
-          <input
-            placeholder="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: 220 }}
-          />
+    <div className="login-shell">
+      <div className="login-card stack-lg animate-in">
+        {/* Logo */}
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.03em" }}>
+            Gym<span className="text-accent">Tracker</span>
+          </div>
+          <p className="text-muted text-sm" style={{ marginTop: 6 }}>
+            {isLogin ? "Welcome back" : "Create your account"}
+          </p>
         </div>
 
-        <div className="spacer" />
+        {/* Form */}
+        <div className="card" style={{ padding: 24 }}>
+          <div className="stack-md">
+            <div className="stack-xs">
+              <label className="label">Email</label>
+              <input
+                className="input"
+                type="email"
+                placeholder="you@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
+                autoComplete="email"
+              />
+            </div>
 
-        <div className="row">
-          <button className="btnPrimary" onClick={handleLogin}>
-            Login
+            <div className="stack-xs">
+              <label className="label">Password</label>
+              <input
+                className="input"
+                type="password"
+                placeholder="8+ characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
+                autoComplete={isLogin ? "current-password" : "new-password"}
+              />
+            </div>
+
+            {status && (
+              <div className={`alert ${status.includes("created") ? "alert-success" : "alert-error"}`}>
+                {status}
+              </div>
+            )}
+
+            <button
+              className="btn btn-primary btn-block"
+              onClick={handleSubmit}
+              disabled={loading}
+              style={{ height: 48, fontSize: 16, fontWeight: 600, marginTop: 4 }}
+            >
+              {loading ? "..." : isLogin ? "Log in" : "Create account"}
+            </button>
+          </div>
+        </div>
+
+        {/* Toggle */}
+        <div style={{ textAlign: "center" }}>
+          <span className="text-dim text-sm">
+            {isLogin ? "No account? " : "Already have one? "}
+          </span>
+          <button
+            className="btn-ghost"
+            onClick={() => { setIsLogin(!isLogin); setStatus(""); }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--accent)",
+              fontFamily: "inherit",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            {isLogin ? "Sign up" : "Log in"}
           </button>
-          <button onClick={handleRegister}>Register</button>
-          <span className="muted">Password must be 8+ chars.</span>
         </div>
       </div>
     </div>
